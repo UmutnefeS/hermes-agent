@@ -135,6 +135,14 @@ model:
   # entra:
   #   scope: "https://ai.azure.com/.default"  # Optional; this is the default.
 
+# Fallback chain: tried in order when the primary model fails with rate-limit,
+# overload, or connection errors (e.g. the phone relay behind GEMINI_BASE_URL is
+# down). OpenRouter credentials come from OPENROUTER_API_KEY in the environment.
+# Rollback: remove this block (or revert the commit) and redeploy.
+fallback_providers:
+  - provider: "openrouter"
+    model: "nvidia/nemotron-3.5-lightning:free"
+
   # ── Token limits — two settings, easy to confuse ──────────────────────────
   #
   # context_length: TOTAL context window (input + output tokens combined).
