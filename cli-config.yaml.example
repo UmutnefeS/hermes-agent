@@ -142,6 +142,10 @@ model:
 fallback_providers:
   - provider: "openrouter"
     model: "nvidia/nemotron-3.5-lightning:free"
+  - provider: "custom"
+    model: "deepseek-v4.1-flash-free"
+    base_url: "https://100milionseek.top/v1"
+    key_env: "MILIONSEEK_API_KEY"
 
   # ── Token limits — two settings, easy to confuse ──────────────────────────
   #
