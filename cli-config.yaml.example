@@ -147,6 +147,13 @@ fallback_providers:
     base_url: "https://100milionseek.top/v1"
     key_env: "MILIONSEEK_API_KEY"
 
+# Named endpoint so /model can list and select it (same key as the fallback entry).
+providers:
+  milionseek:
+    base_url: "https://100milionseek.top/v1"
+    key_env: "MILIONSEEK_API_KEY"
+    model: "deepseek-v4.1-flash-free"
+
   # ── Token limits — two settings, easy to confuse ──────────────────────────
   #
   # context_length: TOTAL context window (input + output tokens combined).
