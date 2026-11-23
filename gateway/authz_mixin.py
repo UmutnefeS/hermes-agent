@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 from gateway.bot_loop_guard import BotLoopGuard
+from gateway.telegram_owner_request import owner_request_key, consume_request
 from gateway.config import Platform
 from gateway.session import SessionSource
 from gateway.whatsapp_identity import (
@@ -839,8 +840,13 @@ class GatewayAuthorizationMixin:
         if executing_admission.get() or getattr(event, "internal", False) or (
                 not is_bot and not self._bot_loop_guard_instance().tracking_chains):
             return True
+        request_key = owner_request_key(event) if is_bot else None
+        claim = (lambda: consume_request(request_key)) if request_key else None
         allowed, state = self._under_authorization_profile(source, lambda: self._bot_loop_guard_instance().chain_admit(
-            self._bot_loop_guard_conversation(source), str(source.user_id or ""), str(event.text or ""), is_bot=is_bot))
+            self._bot_loop_guard_conversation(source), str(source.user_id or ""), str(event.text or ""), is_bot=is_bot,
+            owner_request_claim=claim))
+        if allowed and request_key:
+            logger.info("Accepted one-use owner-linked Telegram request %s", request_key)
         if not allowed:
             logger.info("Bot loop guard ended a bot exchange in %s chat %s (%s from %s; gateway.bot_loop_guard).",
                         source.platform.value if source.platform else "", source.chat_id, state, source.user_id)

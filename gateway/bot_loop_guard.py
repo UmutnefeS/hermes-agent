@@ -157,7 +157,7 @@ class BotLoopGuard:
             events.append(now)
             return True, "ok"
 
-    def chain_admit(self, conversation: Hashable, sender: str, text: str, *, is_bot: bool) -> tuple[bool, str]:
+    def chain_admit(self, conversation: Hashable, sender: str, text: str, *, is_bot: bool, owner_request_claim=None) -> tuple[bool, str]:
         """Apply the chain rules to one admitted inbound message. Returns ``(allowed, state)``; state is
         ``disabled``, ``human`` (chain reset), ``ok``, ``max_hops``, ``duplicate`` or ``reply_to_reply``."""
         settings = self._settings()
@@ -176,10 +176,17 @@ class BotLoopGuard:
             ask = (sender, hashlib.sha256(" ".join(str(text or "").split()).encode()).hexdigest())
             if ask in chain.asks:
                 return False, "duplicate"
-            if not settings.bot_replies_expect_reply and chain.replied_to == sender:
-                return False, "reply_to_reply"
             if chain.hops >= settings.max_hops:
                 return False, "max_hops"
+            # The optional claim is a verified, one-use owner request, not a
+            # blanket peer exemption. Duplicate and hop limits still apply.
+            owner_request = False
+            if owner_request_claim is not None:
+                owner_request = owner_request_claim()
+                if not owner_request:
+                    return False, "owner_request_used"
+            if not settings.bot_replies_expect_reply and chain.replied_to == sender and not owner_request:
+                return False, "reply_to_reply"
             chain.hops += 1
             chain.asks.add(ask)
             return True, "ok"
