@@ -149,6 +149,14 @@ fallback_providers:
 
 # Named endpoint so /model can list and select it (same key as the fallback entry).
 providers:
+  altare-nous:
+    base_url: "http://2.29.240.48:25222/v1"
+    key_env: "NOUS_PROXY_KEY"
+    models:
+      - "upstage/solar-mini4:free"
+      - "tencent/hy4-flash:free"
+      - "stepfun/step-3.7-flash:free"
+      - "meituan/longcat-2.5:free"
   milionseek:
     base_url: "https://100milionseek.top/v1"
     key_env: "MILIONSEEK_API_KEY"
