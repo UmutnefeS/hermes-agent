@@ -153,6 +153,7 @@ providers:
     base_url: "http://2.29.240.48:25222/v1"
     key_env: "NOUS_PROXY_KEY"
     models:
+      - "nous/auto"
       - "upstage/solar-mini4:free"
       - "tencent/hy4-flash:free"
       - "stepfun/step-3.7-flash:free"
