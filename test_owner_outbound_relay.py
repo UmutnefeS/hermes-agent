@@ -6,7 +6,7 @@ import sys
 import tempfile
 from pathlib import Path
 from types import ModuleType, SimpleNamespace as NS
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 import unittest
 from datetime import datetime, timezone
 
@@ -50,8 +50,9 @@ class RelayTests(unittest.TestCase):
                 relay.consume_request=lambda k:consume_request(k,Path(d)/'used.sqlite')
                 try:
                     m=msg('@Hermes_render_bot @Instinctbig_bot merhaba de')
-                    self.assertTrue(await relay.handle_owner_relay(a,m))
-                    self.assertTrue(await relay.handle_owner_relay(a,m))
+                    with patch('gateway.relay_model_rewrite.rewrite_request', new=AsyncMock(return_value='merhaba')):
+                        self.assertTrue(await relay.handle_owner_relay(a,m))
+                        self.assertTrue(await relay.handle_owner_relay(a,m))
                     a.send.assert_awaited_once_with(str(relay.CHAT_ID),'@instinctbig_bot merhaba',reply_to='123')
                 finally:relay.consume_request=saved
         asyncio.run(run())

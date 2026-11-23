@@ -68,6 +68,14 @@ async def handle_owner_relay(adapter, message):
         if not consume_request(key):
             logger.info('Owner relay suppressed: already claimed original=%s target=@%s', message.message_id, target)
             continue
+        from gateway.relay_model_rewrite import rewrite_request
+        source_payload = text.split(' ', 1)[1]
+        rewritten = await rewrite_request(source_payload)
+        if rewritten is None:
+            logger.warning('Owner relay suppressed: rewrite validation failed original=%s target=@%s', message.message_id, target)
+            await adapter.send(str(CHAT_ID), 'İsteği güvenli biçimde yeniden yazamadım. Lütfen tek ve kısa bir istek yazın.', reply_to=str(message.message_id))
+            continue
+        text = '@' + target + ' ' + rewritten
         def admit():
             ok, reason = guard.admit(conversation)
             if ok:

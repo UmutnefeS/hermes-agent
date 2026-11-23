@@ -62,8 +62,11 @@ def owner_request_key(event, now=None):
     relays = [canonical(m.group(1)) for m in HANDLE.finditer(relay_text)]
     if not bots or bots[0] != ORIGIN or TARGET not in bots or relays != [TARGET] or not relay_text.lstrip().lower().startswith('@' + TARGET):
         return None
-    original_payload, relay_payload = payload(original_text), payload(relay_text)
-    if not original_payload or original_payload != relay_payload:
+    original_payload = payload(original_text)
+    first_handle = HANDLE.search(relay_text)
+    relay_payload = relay_text[first_handle.end():].strip() if first_handle else ''
+    from gateway.relay_rewrite_validation import valid_rewrite
+    if not original_payload or not valid_rewrite(original_payload, relay_payload):
         return None
     mid = getattr(original, 'message_id', None)
     return f'{CHAT_ID}:{OWNER_ID}:{mid}:{TARGET}' if isinstance(mid, int) and mid > 0 else None
