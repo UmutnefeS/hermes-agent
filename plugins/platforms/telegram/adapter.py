@@ -5463,6 +5463,9 @@ class TelegramAdapter(TelegramContactMixin, TelegramHeldInboundMixin, TelegramRe
         if not self._bot:
             return False
         bot_username = self._current_bot_username()
+        from plugins.platforms.telegram.first_bot_priority import TEST_GROUP_ID, first_bot_handle
+        if self._is_group_chat(message) and self._chat_id_str(message) == TEST_GROUP_ID and first_bot_handle(message) == bot_username:
+            return True
         bot_id = getattr(self._bot, "id", None)
         expected = f"@{bot_username}" if bot_username else None
         # Server-side MessageEntity values are authoritative: raw substrings like "foo@hermes_bot.example"
@@ -5513,6 +5516,17 @@ class TelegramAdapter(TelegramContactMixin, TelegramHeldInboundMixin, TelegramRe
         bot_username = self._current_bot_username() if self._bot else None
         if not bot_username:
             return False
+        # Owner's Test group rule: first bot mentioned owns the message,
+        # even if we are also mentioned or it is a reply to us.
+        from plugins.platforms.telegram.first_bot_priority import TEST_GROUP_ID, first_bot_handle
+        if self._chat_id_str(message) == TEST_GROUP_ID:
+            first = first_bot_handle(message)
+            if first and first != bot_username.lower():
+                if log_skip:
+                    logger.info("[%s] Skipping message %s in chat %s: first bot is @%s", self.name, getattr(message, "message_id", None), TEST_GROUP_ID, first)
+                return True
+            if first:
+                return False
         from plugins.platforms.telegram.telegram_addressing import foreign_command_target, leading_bot_handles
         target = foreign_command_target(message, bot_username)
         addressed = {target} if target else leading_bot_handles(message, lambda h: h == bot_username or bool(self._FOREIGN_BOT_HANDLE_RE.fullmatch(h)))
