@@ -5870,6 +5870,9 @@ class TelegramAdapter(TelegramContactMixin, TelegramHeldInboundMixin, TelegramRe
             return
         if not self._gate_or_observe(msg, update, MessageType.TEXT):
             return
+        from plugins.platforms.telegram.owner_relay import handle_owner_relay
+        if await handle_owner_relay(self, msg):
+            return
         await self._ensure_forum_commands(update.message)
         self._enqueue_text_event(await self._build_triggered_event(msg, update, MessageType.TEXT))
 
