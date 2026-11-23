@@ -14,23 +14,27 @@ def content_words(s):
     return {w[:5] for w in words if w not in STOP and w not in WRAPPERS}
 
 
-def valid_rewrite(source, candidate):
+def validation_reason(source, candidate):
     if not isinstance(candidate, str) or not 2 <= len(candidate) <= 220:
-        return False
+        return 'length_or_type'
     if any(c in candidate for c in '@/\\\n\r<>`:=') or re.search(r'(?i)https?|www\.|\b(?:com|net|org)\b|[\w-]+\.[a-z]{2,}', candidate):
-        return False
+        return 'forbidden_surface'
     if len(re.findall(r'[.!?]',candidate)) > 1 or re.search(r'[.!?].+\S', candidate):
-        return False
+        return 'multiple_sentences'
     if candidate.lstrip().startswith(('-', '!', '$', '#')):
-        return False
+        return 'command_prefix'
     # Vocabulary may change when the model preserves the owner's intent.
     # This filter enforces shape and hard invariants, not semantic equivalence.
     if not re.search(r'[A-Za-zÇĞİÖŞÜçğıöşü]', candidate):
-        return False
+        return 'no_words'
     if re.findall(r'\d+', source) != re.findall(r'\d+', candidate):
-        return False
+        return 'number_changed'
     # Keep explicit negation. Ambiguous inflected requests fail closed.
     for word in ('degil','hayir','yapma','etme','gonderme','silme'):
         if (word in fold(source).split()) != (word in fold(candidate).split()):
-            return False
-    return True
+            return 'negation_changed'
+    return None
+
+
+def valid_rewrite(source, candidate):
+    return validation_reason(source, candidate) is None

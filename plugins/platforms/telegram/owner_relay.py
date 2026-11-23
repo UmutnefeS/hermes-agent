@@ -72,8 +72,8 @@ async def handle_owner_relay(adapter, message):
         source_payload = text.split(' ', 1)[1]
         rewritten = await rewrite_request(source_payload)
         if rewritten is None:
-            logger.warning('Owner relay suppressed: rewrite validation failed original=%s target=@%s', message.message_id, target)
-            await adapter.send(str(CHAT_ID), 'İsteği güvenli biçimde yeniden yazamadım. Lütfen tek ve kısa bir istek yazın.', reply_to=str(message.message_id))
+            logger.warning('Owner relay suppressed: rewrite unavailable or rejected original=%s target=@%s', message.message_id, target)
+            await adapter.send(str(CHAT_ID), 'İsteği yeniden yazamadım. Model gecikmiş veya yanıt denetimden geçmemiş olabilir. Lütfen yeniden deneyin.', reply_to=str(message.message_id))
             continue
         text = '@' + target + ' ' + rewritten
         def admit():
