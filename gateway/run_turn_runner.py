@@ -290,7 +290,9 @@ class TurnRunner(GatewayTurnProgressMixin, GatewaySessionAgentMixin):
 
     def _setup_stream_consumer(self, platform_key):
         ctx = self._ctx
-        if ctx.mute_notification_reply:
+        from gateway.telegram_bot_answer import answer_only
+        if ctx.mute_notification_reply or answer_only(ctx.source):
+            # No unfiltered drafts/commentary before the answer-only egress guard.
             return None, None, None, False
         stream_consumer = None
         # The streaming-TTS consumer is created on the outer loop thread before run_sync launches;

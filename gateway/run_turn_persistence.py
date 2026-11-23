@@ -159,6 +159,8 @@ class GatewayTurnPersistenceMixin:
 
             _model = str(agent_result.get("model") or "").strip() or t("gateway.errors.empty_response_model_label")
             response = t("gateway.shared.warn_passthrough", error=EMPTY_RESPONSE_EXPLANATION.format(model=_model))
+        from gateway.telegram_bot_answer import sanitize_bot_answer
+        response = sanitize_bot_answer(source, response)
         agent_messages = agent_result.get("messages", [])
         logger.info(
             "response ready: platform=%s chat=%s session=%s time=%.1fs api_calls=%d response=%d chars",
