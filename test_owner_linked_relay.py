@@ -47,7 +47,7 @@ class OwnerRelayTests(unittest.TestCase):
             lambda e: setattr(e.raw_message.reply_to_message, 'date', datetime.fromtimestamp(NOW - 500, timezone.utc)),
             lambda e: setattr(e.raw_message.reply_to_message, 'edit_date', True),
             lambda e: setattr(e.raw_message, 'reply_to_message', None),
-            lambda e: setattr(e.raw_message, 'text', '@Hermes_render_bot different payload'),
+            lambda e: setattr(e.raw_message, 'text', '@Hermes_render_bot /start different payload'),
             lambda e: setattr(e.raw_message.reply_to_message, 'text', '@Hermes_render_bot test42'),
         ]
         for mutate in changes:

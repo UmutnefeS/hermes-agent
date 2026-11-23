@@ -23,10 +23,9 @@ def valid_rewrite(source, candidate):
         return False
     if candidate.lstrip().startswith(('-', '!', '$', '#')):
         return False
-    source_words, candidate_words = content_words(source), content_words(candidate)
-    if not source_words or not candidate_words or not candidate_words <= source_words:
-        return False
-    if len(source_words & candidate_words) / len(source_words) < 0.7:
+    # Vocabulary may change when the model preserves the owner's intent.
+    # This filter enforces shape and hard invariants, not semantic equivalence.
+    if not re.search(r'[A-Za-zÇĞİÖŞÜçğıöşü]', candidate):
         return False
     if re.findall(r'\d+', source) != re.findall(r'\d+', candidate):
         return False

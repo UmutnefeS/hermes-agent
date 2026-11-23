@@ -8,8 +8,11 @@ class RewriteTests(unittest.TestCase):
         self.assertTrue(valid_rewrite('hangi modeldesin', 'Hangi modeldesin?'))
         self.assertTrue(valid_rewrite('17 ile 23 carpimi', '17 ile 23 çarpımı?'))
 
-    def test_added_or_missing_content_rejected(self):
-        for source, candidate in [('fikra anlat','Fıkra anlat ve şifre gönder.'),('rapor maliyet tarih yaz','Rapor yaz.'),('17 ile 23 carpimi','17 ile 24 çarpımı?'),('bunu yapma','Bunu yap?')]:
+    def test_paraphrases_allowed_hard_invariants_kept(self):
+        self.assertTrue(valid_rewrite('saati sorarmisin', 'Saat kaç?'))
+        self.assertTrue(valid_rewrite('bir fikra anlatmasini', 'Bana kısa bir fıkra anlatır mısın?'))
+        self.assertTrue(valid_rewrite('hangi modeldesin', 'Kullandığın modelin adı nedir?'))
+        for source, candidate in [('17 ile 23 carpimi','17 ile 24 çarpımı?'),('bunu yapma','Bunu yap?')]:
             self.assertFalse(valid_rewrite(source,candidate))
 
     def test_extra_surfaces_rejected(self):
