@@ -25,6 +25,13 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(relay.relay_plan(msg('@Hermes_render_bot @Hermes1_instinct1_bot a saati sorarmisin')), [('hermes1_instinct1_bot','@hermes1_instinct1_bot Saat kaç?')])
         self.assertEqual(relay.relay_plan(msg("@Hermes_render_bot @Hermes1_instinct1_bot ve @Instinctbig_bot'a merhaba de")), [('hermes1_instinct1_bot','@hermes1_instinct1_bot merhaba'),('instinctbig_bot','@instinctbig_bot merhaba')])
 
+    def test_only_named_final_verbs_normalized(self):
+        for indirect, imperative in [('anlatmasını','anlat'),('anlatmasini','anlat'),('söylemesini','söyle'),('soylemesini','söyle'),('sormasını','sor'),('sormasini','sor')]:
+            result = relay.relay_plan(msg('@Hermes_render_bot @Instinctbig_bot a bir fikra ' + indirect + ' soylermisin'))
+            self.assertEqual(result, [('instinctbig_bot','@instinctbig_bot bir fikra ' + imperative)])
+        self.assertEqual(relay.relay_plan(msg('@Hermes_render_bot @Instinctbig_bot a bunu yazmasini soylermisin')), [('instinctbig_bot','@instinctbig_bot bunu yazmasini')])
+        self.assertEqual(relay.relay_plan(msg('@Hermes_render_bot @Instinctbig_bot a anlatmasini tekrar soylermisin')), [('instinctbig_bot','@instinctbig_bot anlatmasini tekrar')])
+
     def test_reject_ambiguous_and_wrong_sender(self):
         for text in ['@Instinctbig_bot @Hermes_render_bot selam de', '@Hermes_render_bot @Other_bot selam de', '@Hermes_render_bot @Hermes1_instinct1_bot test', '@Hermes_render_bot @Hermes1_instinct1_bot selam @Other_bot de']:
             self.assertIsNone(relay.relay_plan(msg(text)))

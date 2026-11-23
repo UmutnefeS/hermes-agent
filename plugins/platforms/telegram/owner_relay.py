@@ -39,6 +39,12 @@ def relay_plan(message):
     body = ENDING.sub('', ' ' + text[prefix.end():]).strip()
     if not body or '@' in body or len(body) > 1000:
         return None
+    # Only an explicit final indirect-verb allowlist is converted to an imperative.
+    verbs = {'anlatmasını': 'anlat', 'anlatmasini': 'anlat',
+             'söylemesini': 'söyle', 'soylemesini': 'söyle',
+             'sormasını': 'sor', 'sormasini': 'sor'}
+    body = re.sub(r'(?i)\b(anlatmasını|anlatmasini|söylemesini|soylemesini|sormasını|sormasini)$',
+                  lambda m: verbs.get(m.group(1).lower(), m.group(1)), body)
     # A request to ask the time becomes a fixed question, never a locally answered clock query.
     if re.fullmatch(r'(?i)(?:saati|saat[ıi])', body):
         body = 'Saat kaç?'
