@@ -30,7 +30,7 @@ class BotLoopGuardSettings:
     enabled: bool = True
     max_events: int = 20
     window_seconds: float = 300.0
-    cooldown_seconds: float = 600.0
+    cooldown_seconds: float = 120.0
     max_hops: int = 4
     bot_replies_expect_reply: bool = False
 
