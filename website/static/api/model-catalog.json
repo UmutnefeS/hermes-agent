@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-11-19T17:12:00Z",
+  "updated_at": "2026-11-23T20:38:09Z",
   "metadata": {
     "source": "hermes-agent repo",
     "docs": "https://hermes-agent.nousresearch.com/docs/reference/model-catalog"
@@ -138,6 +138,18 @@
         },
         {
           "id": "openai/gpt-5.4-mini",
+          "description": ""
+        },
+        {
+          "id": "google/gemini-4-neon",
+          "description": ""
+        },
+        {
+          "id": "google/gemini-4-hydrogen",
+          "description": ""
+        },
+        {
+          "id": "google/gemini-4-carbon",
           "description": ""
         },
         {
@@ -328,50 +340,6 @@
         {
           "id": "stealth/space-bunny-alpha",
           "description": "free, stealth model"
-        },
-        {
-          "id": "baidu/ernie-5.5-flash-preview:free",
-          "description": "free"
-        },
-        {
-          "id": "cohere/north-mini-code:free",
-          "description": "free"
-        },
-        {
-          "id": "dots-studio/dots-3-note-preview:free",
-          "description": "free"
-        },
-        {
-          "id": "google/gemma-4-26b-a4b-it:free",
-          "description": "free"
-        },
-        {
-          "id": "google/gemma-4-31b-it:free",
-          "description": "free"
-        },
-        {
-          "id": "inclusionai/ling-3.2-flash:free",
-          "description": "free"
-        },
-        {
-          "id": "liquid/lfm-3-1.7b:free",
-          "description": "free"
-        },
-        {
-          "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-          "description": "free"
-        },
-        {
-          "id": "nvidia/nemotron-3.5-super-vl:free",
-          "description": "free"
-        },
-        {
-          "id": "particle-ai/particle-1:free",
-          "description": "free"
-        },
-        {
-          "id": "recursive/flint-v1.0:free",
-          "description": "free"
         }
       ]
     },
@@ -470,6 +438,15 @@
         },
         {
           "id": "openai/gpt-5.4-mini"
+        },
+        {
+          "id": "google/gemini-4-neon"
+        },
+        {
+          "id": "google/gemini-4-hydrogen"
+        },
+        {
+          "id": "google/gemini-4-carbon"
         },
         {
           "id": "google/gemini-4-argon"
