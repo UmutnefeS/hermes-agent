@@ -1777,6 +1777,14 @@ def _lazy_attr(obj: Any, name: str, factory: Callable[[], Any]) -> Any:
 _strip_media_directives = _strip_media_tag_directives
 
 
+def _auto_tts_max_chars() -> int:
+    """Longest reply (chars) that is spoken back to a voice note; longer replies stay text."""
+    try:
+        return max(int(os.environ.get("HERMES_AUTO_TTS_MAX_CHARS", "600")), 1)
+    except ValueError:
+        return 600
+
+
 class BasePlatformAdapter(_SessionModelSettingsMixin, ABC):
     """Base class for platform adapters: connect/auth, receive, send, handle media."""
 
@@ -4049,6 +4057,9 @@ class BasePlatformAdapter(_SessionModelSettingsMixin, ABC):
         """Auto-TTS on voice input (voice-first), gated by /voice or voice.auto_tts;
         skipped when streaming TTS already delivered audio this turn."""
         generation = getattr(interrupt_event, "_hermes_run_generation", None)
+        # Voice reply only for short, non-error answers; long ones stay text.
+        if not text_content or text_content.startswith("Error:") or len(text_content) > _auto_tts_max_chars():
+            return False
         return bool(
             self._should_auto_tts_for_chat(event.source.chat_id)
             and event.message_type == MessageType.VOICE and text_content and not media_files
@@ -4059,13 +4070,12 @@ class BasePlatformAdapter(_SessionModelSettingsMixin, ABC):
         metadata: dict[str, Any], record_delivery: Callable) -> bool:
         """Play one synthesized TTS file. Returns True when the ORIGINAL reply text rode
         along as a Telegram caption (first file, ≤1024 chars) so the text send is skipped."""
-        caption = None
-        if first and self.platform == Platform.TELEGRAM and text_content and text_content[:1024] == text_content:
-            caption = text_content
+        # Voice-only: on Telegram a short reply to a voice note is sent as audio without the text.
+        # If the audio send fails the text still goes out (return False).
         tts_result = await self.play_tts(
-            chat_id=event.source.chat_id, audio_path=tts_path, caption=caption, metadata=metadata)
+            chat_id=event.source.chat_id, audio_path=tts_path, caption=None, metadata=metadata)
         record_delivery(tts_result)
-        return bool(caption and getattr(tts_result, "success", False))
+        return bool(self.platform == Platform.TELEGRAM and getattr(tts_result, "success", False))
 
     async def _record_delivery_obligation(
         self, event: MessageEvent, session_key: str, text_content: str,

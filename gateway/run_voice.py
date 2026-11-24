@@ -162,8 +162,8 @@ class GatewayVoiceMixin:
             return
         try:
             voice_cfg = _owner_voice_config(getattr(adapter, "_owner_profile", None))
-            auto_tts_default = bool(voice_cfg.get("auto_tts", False))
-            auto_tts_mode = str(voice_cfg.get("auto_tts_mode", "all")).strip().lower()
+            auto_tts_default = bool(voice_cfg.get("auto_tts", True))
+            auto_tts_mode = str(voice_cfg.get("auto_tts_mode", "voice_only")).strip().lower()
             if auto_tts_mode not in {"all", "voice_only"}:
                 logger.warning("Invalid voice.auto_tts_mode=%r; falling back to 'all'", auto_tts_mode)
                 auto_tts_mode = "all"
